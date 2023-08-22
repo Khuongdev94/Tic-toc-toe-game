@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 
 const App = () => {
   const [cells, setCells] = useState([
@@ -8,16 +8,67 @@ const App = () => {
     ["", "", ""],
   ]);
   // trạng thái hiện tại
-  const [activePlayer, setActivePlayer] = useState("X");
+  const [nextTurn, setNextTurn] = useState("X");
   const handlePress = (i, j) => {
-    let temp = [...cells];
-    temp[i][j] = activePlayer;
-    setCells(temp);
-    if (activePlayer === "X") {
-      setActivePlayer("O");
-    } else {
-      setActivePlayer("X");
+    if (!cells[i][j]) {
+      setCells([...cells]);
+      cells[i][j] = nextTurn;
+      if (nextTurn === "X") {
+        setNextTurn("O");
+      } else {
+        setNextTurn("X");
+      }
     }
+    checkWinner(cells);
+  };
+  // const [winner, setWinner] = useState();
+
+  const checkWinner = (cells) => {
+    // Check for a winner in each row.
+    for (let i = 0; i < 3; i++) {
+      if (
+        cells[i][0] === cells[i][1] &&
+        cells[i][1] === cells[i][2] &&
+        cells[i][0]
+      ) {
+        Alert.alert(`người chiến thắng là: ${cells[i][0]}`);
+        handleReset();
+      }
+    }
+
+    // Check for a winner in each column.
+    for (let i = 0; i < 3; i++) {
+      if (
+        cells[0][i] === cells[1][i] &&
+        cells[1][i] === cells[2][i] &&
+        cells[0][i]
+      ) {
+        Alert.alert(`người chiến thắng là: ${cells[0][i]}`);
+        handleReset();
+      }
+    }
+
+    // Check for a winner in the diagonals.
+    if (
+      cells[0][0] === cells[1][1] &&
+      cells[1][1] === cells[2][2] &&
+      cells[0][0]
+    ) {
+      Alert.alert(`người chiến thắng là: ${cells[0][0]}`);
+      handleReset();
+    }
+
+    if (
+      cells[0][2] === cells[1][1] &&
+      cells[1][1] === cells[2][0] &&
+      cells[0][2]
+    ) {
+      Alert.alert(`người chiến thắng là: ${cells[0][2]}`);
+      handleReset();
+    }
+
+    // There is no winner.
+    return null;
   };
 
   const handleReset = () => {
@@ -27,6 +78,7 @@ const App = () => {
       ["", "", ""],
     ]);
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.board}>
@@ -58,8 +110,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   board: {
-    width: 310,
-    height: 310,
+    width: 300,
+    height: 300,
     borderRadius: 10,
     borderWidth: 1,
     backgroundColor: "4D8CF5",
@@ -71,14 +123,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   cell: {
+    width: 70,
+    height: 70,
     borderRadius: 5,
     backgroundColor: "#8EC7D2",
     borderWidth: 1,
-    padding: 15,
+    padding: 5,
     overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
   },
   cellText: {
-    fontSize: 18,
+    fontSize: 26,
     fontWeight: "bold",
   },
   resetButton: {
